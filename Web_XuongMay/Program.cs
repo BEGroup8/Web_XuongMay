@@ -1,8 +1,17 @@
+using Web_XuongMay.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var configuration = builder.Configuration;
 
 builder.Services.AddControllers();
+builder.Services.AddDbContext<MyDbContext>(option =>
+{
+    option.UseSqlServer(configuration.GetConnectionString("MyDb"));
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
