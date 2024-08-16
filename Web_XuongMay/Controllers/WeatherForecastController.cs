@@ -29,6 +29,7 @@ namespace Web_XuongMay.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+            //Test Github
         }
     }
 }
