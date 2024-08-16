@@ -8,10 +8,11 @@ namespace Web_XuongMay.Data
             : base(options)
         {
         }
-
+        #region
         public DbSet<Order> Orders { get; set; }
         public DbSet<Products> Products { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
+        #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
