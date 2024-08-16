@@ -1,0 +1,6 @@
+@Web_XuongMay_HostAddress = http://localhost:5069
+
+GET {{Web_XuongMay_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
