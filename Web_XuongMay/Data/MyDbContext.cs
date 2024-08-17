@@ -33,5 +33,7 @@ namespace Web_XuongMay.Data
                 .WithMany(p => p.OrderProducts)
                 .HasForeignKey(op => op.ProductId);
         }
+
+
     }
 }

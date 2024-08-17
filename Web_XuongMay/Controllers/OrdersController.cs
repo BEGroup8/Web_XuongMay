@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Web_XuongMay.Data;
 using Web_XuongMay.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Web_XuongMay.Controllers
 {
@@ -17,46 +21,28 @@ namespace Web_XuongMay.Controllers
             _context = context;
         }
 
+        // Read all orders
         [HttpGet]
         public IActionResult GetAll()
         {
-            // Nạp dữ liệu liên quan (OrderProducts) khi lấy danh sách đơn hàng
-            var listOrder = _context.Orders.Include(o => o.OrderProducts).ToList();
-            return Ok(listOrder);
+            var orders = _context.Orders.Include(o => o.OrderProducts).ToList();
+            return Ok(orders);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateOrderByID(Guid id, [FromBody] OrderModel orderModel)
+        // Read a specific order by ID
+        [HttpGet("{id}")]
+        public IActionResult GetById(Guid id)
         {
-            if (orderModel == null || id == Guid.Empty)
-            {
-                return BadRequest("Invalid order data or ID.");
-            }
-
-            // Nạp dữ liệu liên quan (OrderProducts) khi cập nhật đơn hàng
-            var order = _context.Orders.Include(o => o.OrderProducts).SingleOrDefault(o => o.Id == id);
+            var order = _context.Orders.Include(o => o.OrderProducts)
+                                       .SingleOrDefault(o => o.Id == id);
             if (order == null)
             {
                 return NotFound($"Order with ID {id} not found.");
             }
-
-            try
-            {
-                // Cập nhật thông tin đơn hàng
-                order.OrderNumber = orderModel.OrderNumber;
-                order.OrderDate = orderModel.OrderDate;
-                order.TotalAmount = orderModel.TotalAmount;
-                order.OrderProducts = orderModel.OrderProducts;
-
-                _context.SaveChanges();
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Failed to update order. Error: {ex.Message}");
-            }
+            return Ok(order);
         }
 
+        // Create a new order
         [HttpPost]
         public IActionResult CreateNew([FromBody] OrderModel orderModel)
         {
@@ -69,6 +55,7 @@ namespace Web_XuongMay.Controllers
             {
                 var order = new Order
                 {
+                    Id = Guid.NewGuid(),
                     OrderNumber = orderModel.OrderNumber,
                     OrderDate = orderModel.OrderDate,
                     TotalAmount = orderModel.TotalAmount,
@@ -79,13 +66,76 @@ namespace Web_XuongMay.Controllers
                     }).ToList()
                 };
 
-                _context.Add(order);
+                _context.Orders.Add(order);
                 _context.SaveChanges();
-                return Ok(order);
+                return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
             }
             catch (Exception ex)
             {
                 return BadRequest($"Failed to create order. Error: {ex.Message}");
+            }
+        }
+
+        // Update an existing order by ID
+        [HttpPut("{id}")]
+        public IActionResult UpdateOrderByID(Guid id, [FromBody] OrderModel orderModel)
+        {
+            if (orderModel == null || id == Guid.Empty)
+            {
+                return BadRequest("Invalid order data or ID.");
+            }
+
+            var order = _context.Orders.Include(o => o.OrderProducts)
+                                       .SingleOrDefault(o => o.Id == id);
+            if (order == null)
+            {
+                return NotFound($"Order with ID {id} not found.");
+            }
+
+            try
+            {
+                order.OrderNumber = orderModel.OrderNumber;
+                order.OrderDate = orderModel.OrderDate;
+                order.TotalAmount = orderModel.TotalAmount;
+
+                // Update OrderProducts
+                _context.OrderProducts.RemoveRange(order.OrderProducts);
+                order.OrderProducts = orderModel.OrderProducts.Select(op => new OrderProduct
+                {
+                    OrderId = id,
+                    ProductId = op.ProductId,
+                    Quantity = op.Quantity
+                }).ToList();
+
+                _context.SaveChanges();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to update order. Error: {ex.Message}");
+            }
+        }
+
+        // Delete an order by ID
+        [HttpDelete("{id}")]
+        public IActionResult DeleteOrder(Guid id)
+        {
+            var order = _context.Orders.Include(o => o.OrderProducts)
+                                       .SingleOrDefault(o => o.Id == id);
+            if (order == null)
+            {
+                return NotFound($"Order with ID {id} not found.");
+            }
+
+            try
+            {
+                _context.Orders.Remove(order);
+                _context.SaveChanges();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to delete order. Error: {ex.Message}");
             }
         }
     }
