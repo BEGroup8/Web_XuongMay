@@ -12,6 +12,19 @@ namespace Web_XuongMay.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Loai",
+                columns: table => new
+                {
+                    MaLoai = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TenLoai = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Loai", x => x.MaLoai);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
@@ -36,6 +49,42 @@ namespace Web_XuongMay.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.MaHH);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Catagory",
+                columns: table => new
+                {
+                    Mahh = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Tenhang = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Mota = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DonGia = table.Column<double>(type: "float", nullable: false),
+                    MaLoai = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Catagory", x => x.Mahh);
+                    table.ForeignKey(
+                        name: "FK_Catagory_Loai_MaLoai",
+                        column: x => x.MaLoai,
+                        principalTable: "Loai",
+                        principalColumn: "MaLoai");
                 });
 
             migrationBuilder.CreateTable(
@@ -64,16 +113,36 @@ namespace Web_XuongMay.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Catagory_MaLoai",
+                table: "Catagory",
+                column: "MaLoai");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderProducts_ProductId",
                 table: "OrderProducts",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_UserName",
+                table: "User",
+                column: "UserName",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Catagory");
+
+            migrationBuilder.DropTable(
                 name: "OrderProducts");
+
+            migrationBuilder.DropTable(
+                name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Loai");
 
             migrationBuilder.DropTable(
                 name: "Orders");
