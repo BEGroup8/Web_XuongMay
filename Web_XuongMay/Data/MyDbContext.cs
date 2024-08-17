@@ -9,6 +9,8 @@ namespace Web_XuongMay.Data
         {
         }
         #region
+        public DbSet<Loai> Loais { get; set; }
+        public DbSet<Catagory> Catagories { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Products> Products { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
