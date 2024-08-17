@@ -12,18 +12,18 @@ namespace Web_XuongMay.Controllers
     public class CatagoryController : ControllerBase
     {
         public static List<Catagory> catagories = new List<Catagory>();
+
         [HttpGet]
         public ActionResult GetAll()
         {
             return Ok(catagories);
-
         }
+
         [HttpGet("{id}")]
         public IActionResult GetById(string id)
         {
             try
             {
-                //Linq [object query
                 var catagory = catagories.SingleOrDefault(hh => hh.Mahh == Guid.Parse(id));
                 if (catagory == null)
                 {
@@ -38,7 +38,7 @@ namespace Web_XuongMay.Controllers
         }
 
         [HttpPost]
-        private IActionResult Create(CatagoryVM catagoryVM)
+        public IActionResult Create(CatagoryVM catagoryVM)
         {
             var catagory = new Catagory
             {
@@ -52,6 +52,57 @@ namespace Web_XuongMay.Controllers
                 Success = true,
                 Data = catagories
             });
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(string id, CatagoryVM catagoryVM)
+        {
+            try
+            {
+                var catagory = catagories.SingleOrDefault(hh => hh.Mahh == Guid.Parse(id));
+                if (catagory == null)
+                {
+                    return NotFound();
+                }
+
+                catagory.Tenhang = catagoryVM.Tenhang;
+                catagory.DonGia = catagoryVM.DonGia;
+
+                return Ok(new
+                {
+                    Success = true,
+                    Data = catagory
+                });
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
+            try
+            {
+                var catagory = catagories.SingleOrDefault(hh => hh.Mahh == Guid.Parse(id));
+                if (catagory == null)
+                {
+                    return NotFound();
+                }
+
+                catagories.Remove(catagory);
+
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Deleted successfully"
+                });
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }
