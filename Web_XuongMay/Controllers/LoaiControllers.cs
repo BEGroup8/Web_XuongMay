@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Web_XuongMay.Data;
 using Web_XuongMay.Models;
+using Web_XuongMay.Services;
 
 namespace Web_XuongMay.Controllers
 {
@@ -10,77 +9,90 @@ namespace Web_XuongMay.Controllers
     [ApiController]
     public class LoaiControllers : ControllerBase
     {
-        private readonly MyDbContext _context;
+        private readonly ILoaiRepository _loaiRepository;
 
-        public LoaiControllers(MyDbContext context)
-        {
-            _context = context;
+        public LoaiControllers(ILoaiRepository loaiRepository) {
 
+        _loaiRepository = loaiRepository;
         }
         [HttpGet]
         public IActionResult GetAll()
-
-        {
-            var dsLoai = _context.Loais.ToList();
-            return Ok(dsLoai);
-
-        }
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-
-        {
-            var loai = _context.Loais.SingleOrDefault(lo =>
-            lo.MaLoai == id);
-            if (loai != null)
-            {
-                return Ok(loai);
-            }
-            else
-            {
-                return NotFound();
-            }
-
-        }
-        [HttpPost]
-        public IActionResult CreateNew(LoaiModel model)
         {
             try
             {
-                var loai = new Loai
-                {
-                    TenLoai = model.TenLoai,
-                };
-
-                _context.Add(model);
-                _context.SaveChanges();
-                return Ok(loai);
+                return Ok(_loaiRepository.GetAll());
             }
             catch
-            { return BadRequest(0); 
+            {
+                return BadRequest();
             }
         }
-
-
-
-        [HttpPut("{id}")]
-        public IActionResult UpdateLoaiById(int id, LoaiModel model)
-
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
         {
-            var loai = _context.Loais.SingleOrDefault(lo =>
-            lo.MaLoai == id);
-            if (loai != null)
-            {
-                loai.TenLoai = model.TenLoai;
-                _context.SaveChanges();
-                return NoContent();
-            }
-            else
-            {
-                return NotFound();
+            
 
+            try
+            {
+                var data = _loaiRepository.GetById(id);
+                if(data != null)
+                {
+                    return Ok(data);
+                }
+                else
+                {
+                    return NotFound();
+                }
+              
+            }
+            catch
+            {
+                return BadRequest();
             }
         }
-       
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, LoaiVM loai)
+        {
+            if (id != loai.MaLoai)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                _loaiRepository.Update(loai);
+                return NoContent();
+                    
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                _loaiRepository.Delete(id);
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpPost]
+        public IActionResult Add(LoaiModel loai)
+        {
+            try
+            {
+                return Ok(_loaiRepository.Add(loai));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
 
     }
 }
