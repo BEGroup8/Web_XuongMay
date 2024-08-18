@@ -43,6 +43,14 @@ namespace Web_XuongMay.Data
                 .HasOne(op => op.Product)
                 .WithMany(p => p.OrderProducts)
                 .HasForeignKey(op => op.ProductId);
+
+            // Configure Order entity
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.Property(e => e.TotalAmount)
+                    .HasColumnType("decimal(18,2)"); // Set precision and scale
+            });
         }
+
     }
 }
