@@ -4,6 +4,12 @@ using Web_XuongMay.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers();
+
+builder.Services.AddDbContext<MyDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyDB"));
+});
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<MyDbContext>(option =>
