@@ -5,7 +5,7 @@ namespace Web_XuongMay.Models
     public class LoaiVM
     {
         
-        public Guid MaLoai { get; set; }
+        public int MaLoai { get; set; }
        
         public string TenLoai { get; set; }
     }
