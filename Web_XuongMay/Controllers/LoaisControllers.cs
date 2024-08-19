@@ -27,7 +27,7 @@ namespace Web_XuongMay.Controllers
 
         }
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public IActionResult GetById(Guid id)
 
         {
             var loai = _context.Loais.SingleOrDefault(lo =>
@@ -66,7 +66,7 @@ namespace Web_XuongMay.Controllers
 
 
         [HttpPut("{id}")]
-        public IActionResult UpdateLoaiById(int id, LoaiModel model)
+        public IActionResult UpdateLoaiById(Guid id, LoaiModel model)
 
         {
             var loai = _context.Loais.SingleOrDefault(lo =>
