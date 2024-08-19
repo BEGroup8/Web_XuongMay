@@ -15,8 +15,7 @@ namespace Web_XuongMay.Migrations
                 name: "Loai",
                 columns: table => new
                 {
-                    MaLoai = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MaLoai = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TenLoai = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -39,19 +38,6 @@ namespace Web_XuongMay.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    MaHH = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TenMH = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    MoTa = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.MaHH);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -68,23 +54,23 @@ namespace Web_XuongMay.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Catagory",
+                name: "Products",
                 columns: table => new
                 {
-                    Mahh = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Tenhang = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Mota = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DonGia = table.Column<double>(type: "float", nullable: false),
-                    MaLoai = table.Column<int>(type: "int", nullable: true)
+                    MaHH = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TenMH = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    MoTa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MaLoai = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Catagory", x => x.Mahh);
+                    table.PrimaryKey("PK_Products", x => x.MaHH);
                     table.ForeignKey(
-                        name: "FK_Catagory_Loai_MaLoai",
+                        name: "FK_Products_Loai_MaLoai",
                         column: x => x.MaLoai,
                         principalTable: "Loai",
-                        principalColumn: "MaLoai");
+                        principalColumn: "MaLoai",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -114,11 +100,6 @@ namespace Web_XuongMay.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Catagory_MaLoai",
-                table: "Catagory",
-                column: "MaLoai");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OrderProducts_OrderId",
                 table: "OrderProducts",
                 column: "OrderId");
@@ -127,14 +108,16 @@ namespace Web_XuongMay.Migrations
                 name: "IX_OrderProducts_ProductId",
                 table: "OrderProducts",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_MaLoai",
+                table: "Products",
+                column: "MaLoai");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Catagory");
-
             migrationBuilder.DropTable(
                 name: "OrderProducts");
 
@@ -142,13 +125,13 @@ namespace Web_XuongMay.Migrations
                 name: "User");
 
             migrationBuilder.DropTable(
-                name: "Loai");
-
-            migrationBuilder.DropTable(
                 name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Loai");
         }
     }
 }

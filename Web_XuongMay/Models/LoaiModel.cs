@@ -6,7 +6,6 @@ namespace Web_XuongMay.Models
     {
         [Required]
         [MaxLength(50)]
-        public string TenLoai {  get; set; }
+        public string TenLoai { get; set; }
     }
-    
 }

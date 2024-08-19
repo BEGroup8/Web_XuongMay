@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -17,6 +16,9 @@ namespace Web_XuongMay.Data
 
         public string MoTa { get; set; }
 
+        public Guid MaLoai { get; set; }  // Khóa ngoại
 
+        [ForeignKey(nameof(MaLoai))]
+        public virtual Loai Loai { get; set; }  // Thuộc tính điều hướng
     }
 }

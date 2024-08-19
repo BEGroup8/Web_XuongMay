@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Web_XuongMay.Data;
 using Web_XuongMay.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Web_XuongMay.Controllers
 {
@@ -24,17 +28,14 @@ namespace Web_XuongMay.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(string id)
+        public IActionResult GetById(Guid id)
         {
-            var productId = Guid.Parse(id);
-            var product = _context.Products.SingleOrDefault(p => p.MaHH == productId);
-
-            if (product == null)
+            var products = _context.Products.SingleOrDefault(p => p.MaHH == id);
+            if (products == null)
             {
-                return NotFound();
+                return NotFound($"Order with ID {id} not found.");
             }
-
-            return Ok(product);
+            return Ok(products);
         }
 
         [HttpPost]
@@ -44,18 +45,14 @@ namespace Web_XuongMay.Controllers
             {
                 MaHH = Guid.NewGuid(),
                 TenMH = productVM.TenHangHoa,
-                MoTa = productVM.Mota
+                MoTa = productVM.Mota,
+                MaLoai = productVM.MaLoai // Ensure this is a valid ID for Loai
             };
 
             _context.Products.Add(product);
             _context.SaveChanges();
 
-            return Ok(new
-            {
-                Success = true,
-                Data = product
-            });
+            return CreatedAtAction(nameof(GetById), new { id = product.MaHH }, product);
         }
     }
-
 }

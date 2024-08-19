@@ -12,7 +12,7 @@ using Web_XuongMay.Data;
 namespace Web_XuongMay.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240819024615_DbInit")]
+    [Migration("20240819041314_DbInit")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -49,41 +49,11 @@ namespace Web_XuongMay.Migrations
                     b.ToTable("OrderProducts");
                 });
 
-            modelBuilder.Entity("Web_XuongMay.Data.Catagory", b =>
-                {
-                    b.Property<Guid>("Mahh")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("DonGia")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("MaLoai")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Mota")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tenhang")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Mahh");
-
-                    b.HasIndex("MaLoai");
-
-                    b.ToTable("Catagory");
-                });
-
             modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
                 {
-                    b.Property<int>("MaLoai")
+                    b.Property<Guid>("MaLoai")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaLoai"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("TenLoai")
                         .IsRequired()
@@ -124,6 +94,9 @@ namespace Web_XuongMay.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("MaHH");
 
+                    b.Property<Guid>("MaLoai")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("MoTa")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -134,6 +107,8 @@ namespace Web_XuongMay.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("MaHH");
+
+                    b.HasIndex("MaLoai");
 
                     b.ToTable("Products");
                 });
@@ -188,18 +163,20 @@ namespace Web_XuongMay.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Web_XuongMay.Data.Catagory", b =>
+            modelBuilder.Entity("Web_XuongMay.Data.Products", b =>
                 {
                     b.HasOne("Web_XuongMay.Data.Loai", "Loai")
-                        .WithMany("Catagories")
-                        .HasForeignKey("MaLoai");
+                        .WithMany("Products")
+                        .HasForeignKey("MaLoai")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Loai");
                 });
 
             modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
                 {
-                    b.Navigation("Catagories");
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

@@ -13,7 +13,6 @@ namespace Web_XuongMay.Data
         #region DbSet
         public DbSet<User> Users { get; set; }
         public DbSet<Loai> Loais { get; set; }
-        public DbSet<Catagory> Catagories { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Products> Products { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
