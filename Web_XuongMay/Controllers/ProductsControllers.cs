@@ -1,57 +1,106 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Web_XuongMay.Data;
 using Web_XuongMay.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Web_XuongMay.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class ProductsControllers : ControllerBase
+    [Route("api/[controller]")]
+    public class ProductsController : ControllerBase
     {
-        public static List<Products> hangHoas = new List<Products>();
+        private readonly MyDbContext _context;
+
+        public ProductsController(MyDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(hangHoas);
+            var products = _context.Products.ToList();
+            return Ok(products);
         }
 
-
         [HttpGet("{id}")]
-        public IActionResult GetById(string id)
+        public IActionResult GetById(Guid id)
+        {
+            var product = _context.Products.SingleOrDefault(p => p.MaHH == id);
+            if (product == null)
+            {
+                return NotFound($"Product with ID {id} not found.");
+            }
+            return Ok(product);
+        }
+
+        [HttpPost]
+        public IActionResult Create(ProductsVM productVM)
+        {
+            var product = new Products
+            {
+                MaHH = Guid.NewGuid(),
+                TenMH = productVM.TenHangHoa,
+                MoTa = productVM.Mota,
+                MaLoai = productVM.MaLoai // Ensure this is a valid ID for Loai
+            };
+
+            _context.Products.Add(product);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetById), new { id = product.MaHH }, product);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Edit(Guid id, Products hangHoaEdit)
         {
             try
             {
-                // LINQ [Object] Query
-                var hangHoa = hangHoas.SingleOrDefault(hh => hh.MaHH == Guid.Parse(id));
+                var hangHoa = _context.Products.SingleOrDefault(hh => hh.MaHH == id);
                 if (hangHoa == null)
                 {
                     return NotFound();
                 }
-                return Ok(hangHoa);
+
+                // Update
+                hangHoa.TenMH = hangHoaEdit.TenMH;
+                hangHoa.MoTa = hangHoaEdit.MoTa;
+
+                _context.Products.Update(hangHoa);
+                _context.SaveChanges();
+
+                return Ok();
             }
             catch
             {
                 return BadRequest();
             }
         }
-        
-        [HttpPost]
-        public IActionResult Create(ProductsVM hangHoaVM)
+
+        [HttpDelete("{id}")]
+        public IActionResult Remove(Guid id)
         {
-            var hanghoa = new Products
+            try
             {
-                MaHH = Guid.NewGuid(),
-                TenMH = hangHoaVM.TenHangHoa,
-                MoTa = hangHoaVM.Mota
-            };
-            hangHoas.Add(hanghoa);
-            return Ok(new
+                var hangHoa = _context.Products.SingleOrDefault(hh => hh.MaHH == id);
+                if (hangHoa == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Products.Remove(hangHoa);
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            catch
             {
-                Success = true,
-                Data = hanghoa
-            });
+                return BadRequest();
+            }
         }
     }
 }
