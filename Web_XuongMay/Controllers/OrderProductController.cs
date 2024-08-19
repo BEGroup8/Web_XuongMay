@@ -84,19 +84,18 @@ namespace Web_XuongMay.Controllers
                 return BadRequest($"Không thể tạo đơn hàng. Lỗi: {ex.Message}");
             }
         }
-        // Update an existing order product
-        [HttpPut("{orderId}/{productId}")]
-        public IActionResult UpdateOrderProduct(Guid orderId, Guid productId, [FromBody] OrderProduct updatedOrderProduct)
+        [HttpPut("{id}")]
+        public IActionResult UpdateOrderProduct(Guid id, [FromBody] OrderProduct updatedOrderProduct)
         {
-            if (updatedOrderProduct == null || orderId == Guid.Empty || productId == Guid.Empty)
+            if (updatedOrderProduct == null || id == Guid.Empty)
             {
-                return BadRequest("Invalid order product data or IDs.");
+                return BadRequest("Invalid order product data or ID.");
             }
 
-            var existingOrderProduct = _context.OrderProducts.SingleOrDefault(op => op.OrderId == orderId && op.ProductId == productId);
+            var existingOrderProduct = _context.OrderProducts.SingleOrDefault(op => op.Id == id);
             if (existingOrderProduct == null)
             {
-                return NotFound($"OrderProduct with OrderId {orderId} and ProductId {productId} not found.");
+                return NotFound($"OrderProduct with ID {id} not found.");
             }
 
             try
@@ -112,14 +111,13 @@ namespace Web_XuongMay.Controllers
             }
         }
 
-        // Delete an order product
-        [HttpDelete("{orderId}/{productId}")]
-        public IActionResult DeleteOrderProduct(Guid orderId, Guid productId)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteOrderProduct(Guid id)
         {
-            var orderProduct = _context.OrderProducts.SingleOrDefault(op => op.OrderId == orderId && op.ProductId == productId);
+            var orderProduct = _context.OrderProducts.SingleOrDefault(op => op.Id == id);
             if (orderProduct == null)
             {
-                return NotFound($"OrderProduct with OrderId {orderId} and ProductId {productId} not found.");
+                return NotFound($"OrderProduct with ID {id} not found.");
             }
 
             try
@@ -133,5 +131,6 @@ namespace Web_XuongMay.Controllers
                 return BadRequest($"Failed to delete order product. Error: {ex.Message}");
             }
         }
+
     }
 }

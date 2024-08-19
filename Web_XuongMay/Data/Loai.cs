@@ -15,6 +15,5 @@ namespace Web_XuongMay.Data
         [MaxLength(50)]
         public string TenLoai { get; set; }
 
-        public virtual ICollection<Products> Products { get; set; }  // Thuộc tính điều hướng
     }
 }

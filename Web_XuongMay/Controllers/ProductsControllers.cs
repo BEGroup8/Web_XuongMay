@@ -30,12 +30,12 @@ namespace Web_XuongMay.Controllers
         [HttpGet("{id}")]
         public IActionResult GetById(Guid id)
         {
-            var products = _context.Products.SingleOrDefault(p => p.MaHH == id);
-            if (products == null)
+            var product = _context.Products.SingleOrDefault(p => p.MaHH == id);
+            if (product == null)
             {
-                return NotFound($"Order with ID {id} not found.");
+                return NotFound($"Product with ID {id} not found.");
             }
-            return Ok(products);
+            return Ok(product);
         }
 
         [HttpPost]
@@ -53,6 +53,54 @@ namespace Web_XuongMay.Controllers
             _context.SaveChanges();
 
             return CreatedAtAction(nameof(GetById), new { id = product.MaHH }, product);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Edit(Guid id, Products hangHoaEdit)
+        {
+            try
+            {
+                var hangHoa = _context.Products.SingleOrDefault(hh => hh.MaHH == id);
+                if (hangHoa == null)
+                {
+                    return NotFound();
+                }
+
+                // Update
+                hangHoa.TenMH = hangHoaEdit.TenMH;
+                hangHoa.MoTa = hangHoaEdit.MoTa;
+
+                _context.Products.Update(hangHoa);
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Remove(Guid id)
+        {
+            try
+            {
+                var hangHoa = _context.Products.SingleOrDefault(hh => hh.MaHH == id);
+                if (hangHoa == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Products.Remove(hangHoa);
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }
