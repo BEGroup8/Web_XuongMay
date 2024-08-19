@@ -17,7 +17,6 @@ namespace Web_XuongMay.Data
 
         public string MoTa { get; set; }
 
-        // Sử dụng IEnumerable để biểu diễn tập hợp dữ liệu
-        public virtual IEnumerable<OrderProduct> OrderProducts { get; set; }
+
     }
 }

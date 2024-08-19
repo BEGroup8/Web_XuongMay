@@ -8,8 +8,6 @@ namespace Web_XuongMay.Models
         public string OrderNumber { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal TotalAmount { get; set; }
-
-        // Sử dụng IEnumerable để biểu diễn tập hợp dữ liệu
-        public virtual IEnumerable<OrderProduct> OrderProducts { get; set; }
+        public List<OrderProductModel> OrderProducts { get; set; }
     }
 }

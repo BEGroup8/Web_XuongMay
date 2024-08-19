@@ -20,51 +20,70 @@ namespace Web_XuongMay.Controllers
             _context = context;
         }
 
-        // Get all order products
         [HttpGet]
         public IActionResult GetAll()
         {
-            var orderProducts = _context.OrderProducts.Include(op => op.Order)
-                                                      .Include(op => op.Product)
-                                                      .ToList();
-            return Ok(orderProducts);
+            var orderproducts = _context.OrderProducts.ToList();
+            return Ok(orderproducts);
         }
 
-        // Get a specific order product by order ID and product ID
-        [HttpGet("{orderId}/{productId}")]
-        public IActionResult GetById(Guid orderId, Guid productId)
+        [HttpGet("{orderId}")]
+        public IActionResult GetById(Guid orderId)
         {
-            var orderProduct = _context.OrderProducts.Include(op => op.Order)
-                                                      .Include(op => op.Product)
-                                                      .SingleOrDefault(op => op.OrderId == orderId && op.ProductId == productId);
-            if (orderProduct == null)
+            var order = _context.Orders.SingleOrDefault(o => o.OrderId == orderId);
+            if (order == null)
             {
-                return NotFound($"OrderProduct with OrderId {orderId} and ProductId {productId} not found.");
+                return NotFound($"Đơn hàng với ID {orderId} không tìm thấy.");
             }
-            return Ok(orderProduct);
-        }
 
-        // Create a new order product
+            return Ok(order);
+        }
         [HttpPost]
-        public IActionResult CreateNew([FromBody] OrderProduct orderProduct)
+        public async Task<IActionResult> CreateOrder([FromBody] OrderModel orderModel)
         {
-            if (orderProduct == null)
+            if (orderModel == null)
             {
-                return BadRequest("OrderProduct data is null.");
+                return BadRequest("Dữ liệu đơn hàng bị null.");
+            }
+
+            var order = new Order
+            {
+                OrderId = Guid.NewGuid(),
+                OrderNumber = orderModel.OrderNumber,
+                OrderDate = orderModel.OrderDate,
+                TotalAmount = orderModel.TotalAmount
+            };
+
+            _context.Orders.Add(order);
+
+            foreach (var orderProductModel in orderModel.OrderProducts)
+            {
+                var orderProduct = new OrderProduct
+                {
+                    Id = Guid.NewGuid(),
+                    OrderId = order.OrderId,
+                    ProductId = orderProductModel.ProductId,
+                    Quantity = orderProductModel.Quantity
+                };
+                _context.OrderProducts.Add(orderProduct);
             }
 
             try
             {
-                _context.OrderProducts.Add(orderProduct);
-                _context.SaveChanges();
-                return CreatedAtAction(nameof(GetById), new { orderId = orderProduct.OrderId, productId = orderProduct.ProductId }, orderProduct);
+                await _context.SaveChangesAsync();
+                // Chỉ định chính xác tên hành động và các tham số tuyến đường
+                return CreatedAtAction(nameof(GetById), new { orderId = order.OrderId }, order);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                var sqlError = dbEx.InnerException?.Message ?? dbEx.Message;
+                return BadRequest($"Không thể tạo đơn hàng. Lỗi cơ sở dữ liệu: {sqlError}");
             }
             catch (Exception ex)
             {
-                return BadRequest($"Failed to create order product. Error: {ex.Message}");
+                return BadRequest($"Không thể tạo đơn hàng. Lỗi: {ex.Message}");
             }
         }
-
         // Update an existing order product
         [HttpPut("{orderId}/{productId}")]
         public IActionResult UpdateOrderProduct(Guid orderId, Guid productId, [FromBody] OrderProduct updatedOrderProduct)

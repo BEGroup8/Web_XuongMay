@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Web_XuongMay.Data;
 using Web_XuongMay.Models;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web_XuongMay.Controllers
 {
@@ -21,20 +19,17 @@ namespace Web_XuongMay.Controllers
             _context = context;
         }
 
-        // Read all orders
         [HttpGet]
         public IActionResult GetAll()
         {
-            var orders = _context.Orders.Include(o => o.OrderProducts).ToList();
+            var orders = _context.Orders.ToList();
             return Ok(orders);
         }
 
-        // Read a specific order by ID
         [HttpGet("{id}")]
         public IActionResult GetById(Guid id)
         {
-            var order = _context.Orders.Include(o => o.OrderProducts)
-                                       .SingleOrDefault(o => o.Id == id);
+            var order = _context.Orders.SingleOrDefault(o => o.OrderId == id);
             if (order == null)
             {
                 return NotFound($"Order with ID {id} not found.");
@@ -42,7 +37,6 @@ namespace Web_XuongMay.Controllers
             return Ok(order);
         }
 
-        // Create a new order
         [HttpPost]
         public IActionResult CreateNew([FromBody] OrderModel orderModel)
         {
@@ -55,20 +49,20 @@ namespace Web_XuongMay.Controllers
             {
                 var order = new Order
                 {
-                    Id = Guid.NewGuid(),
+                    OrderId = Guid.NewGuid(),
                     OrderNumber = orderModel.OrderNumber,
                     OrderDate = orderModel.OrderDate,
-                    TotalAmount = orderModel.TotalAmount,
-                    OrderProducts = orderModel.OrderProducts.Select(op => new OrderProduct
-                    {
-                        ProductId = op.ProductId,
-                        Quantity = op.Quantity
-                    }).ToList()
+                    TotalAmount = orderModel.TotalAmount
                 };
 
                 _context.Orders.Add(order);
                 _context.SaveChanges();
-                return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
+
+                return Ok(new
+                {
+                    Success = true,
+                    Data = order
+                });
             }
             catch (Exception ex)
             {
@@ -76,7 +70,6 @@ namespace Web_XuongMay.Controllers
             }
         }
 
-        // Update an existing order by ID
         [HttpPut("{id}")]
         public IActionResult UpdateOrderByID(Guid id, [FromBody] OrderModel orderModel)
         {
@@ -85,8 +78,7 @@ namespace Web_XuongMay.Controllers
                 return BadRequest("Invalid order data or ID.");
             }
 
-            var order = _context.Orders.Include(o => o.OrderProducts)
-                                       .SingleOrDefault(o => o.Id == id);
+            var order = _context.Orders.SingleOrDefault(o => o.OrderId == id);
             if (order == null)
             {
                 return NotFound($"Order with ID {id} not found.");
@@ -98,15 +90,7 @@ namespace Web_XuongMay.Controllers
                 order.OrderDate = orderModel.OrderDate;
                 order.TotalAmount = orderModel.TotalAmount;
 
-                // Update OrderProducts
-                _context.OrderProducts.RemoveRange(order.OrderProducts);
-                order.OrderProducts = orderModel.OrderProducts.Select(op => new OrderProduct
-                {
-                    OrderId = id,
-                    ProductId = op.ProductId,
-                    Quantity = op.Quantity
-                }).ToList();
-
+                _context.Orders.Update(order);
                 _context.SaveChanges();
                 return NoContent();
             }
@@ -116,12 +100,10 @@ namespace Web_XuongMay.Controllers
             }
         }
 
-        // Delete an order by ID
         [HttpDelete("{id}")]
         public IActionResult DeleteOrder(Guid id)
         {
-            var order = _context.Orders.Include(o => o.OrderProducts)
-                                       .SingleOrDefault(o => o.Id == id);
+            var order = _context.Orders.SingleOrDefault(o => o.OrderId == id);
             if (order == null)
             {
                 return NotFound($"Order with ID {id} not found.");

@@ -5,53 +5,57 @@ using Web_XuongMay.Models;
 
 namespace Web_XuongMay.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class ProductsControllers : ControllerBase
+    [Route("api/[controller]")]
+    public class ProductsController : ControllerBase
     {
-        public static List<Products> hangHoas = new List<Products>();
+        private readonly MyDbContext _context;
+
+        public ProductsController(MyDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(hangHoas);
+            var products = _context.Products.ToList();
+            return Ok(products);
         }
-
 
         [HttpGet("{id}")]
         public IActionResult GetById(string id)
         {
-            try
+            var productId = Guid.Parse(id);
+            var product = _context.Products.SingleOrDefault(p => p.MaHH == productId);
+
+            if (product == null)
             {
-                // LINQ [Object] Query
-                var hangHoa = hangHoas.SingleOrDefault(hh => hh.MaHH == Guid.Parse(id));
-                if (hangHoa == null)
-                {
-                    return NotFound();
-                }
-                return Ok(hangHoa);
+                return NotFound();
             }
-            catch
-            {
-                return BadRequest();
-            }
+
+            return Ok(product);
         }
-        
+
         [HttpPost]
-        public IActionResult Create(ProductsVM hangHoaVM)
+        public IActionResult Create(ProductsVM productVM)
         {
-            var hanghoa = new Products
+            var product = new Products
             {
                 MaHH = Guid.NewGuid(),
-                TenMH = hangHoaVM.TenHangHoa,
-                MoTa = hangHoaVM.Mota
+                TenMH = productVM.TenHangHoa,
+                MoTa = productVM.Mota
             };
-            hangHoas.Add(hanghoa);
+
+            _context.Products.Add(product);
+            _context.SaveChanges();
+
             return Ok(new
             {
                 Success = true,
-                Data = hanghoa
+                Data = product
             });
         }
     }
+
 }
