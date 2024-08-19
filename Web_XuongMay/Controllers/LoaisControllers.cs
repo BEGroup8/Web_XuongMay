@@ -58,7 +58,8 @@ namespace Web_XuongMay.Controllers
                 return Ok(loai);
             }
             catch
-            { return BadRequest(0); 
+            {
+                return BadRequest(0);
             }
         }
 
@@ -82,7 +83,7 @@ namespace Web_XuongMay.Controllers
 
             }
         }
-       
+
 
     }
 }
