@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -27,6 +28,15 @@ namespace Web_XuongMay.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "Id",
+                table: "User",
+                type: "uniqueidentifier",
+                nullable: false,
+                oldClrType: typeof(int),
+                oldType: "int")
+                .OldAnnotation("SqlServer:Identity", "1, 1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_UserName",
@@ -59,6 +69,15 @@ namespace Web_XuongMay.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(150)",
                 oldMaxLength: 150);
+
+            migrationBuilder.AlterColumn<int>(
+                name: "Id",
+                table: "User",
+                type: "int",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier")
+                .Annotation("SqlServer:Identity", "1, 1");
         }
     }
 }

@@ -51,6 +51,8 @@ namespace Web_XuongMay.Data
 
             modelBuilder.Entity<User>(entity =>
             {
+                entity.HasKey(e => e.Id);
+                
                 entity.HasIndex(e => e.UserName).IsUnique();
                 entity.Property(e => e.FullName).IsRequired().HasMaxLength(150);
                 entity.Property(e => e.Email).IsRequired().HasMaxLength(150);

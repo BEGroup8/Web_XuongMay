@@ -12,7 +12,7 @@ using Web_XuongMay.Data;
 namespace Web_XuongMay.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240819071736_AddUser")]
+    [Migration("20240819141855_AddUser")]
     partial class AddUser
     {
         /// <inheritdoc />
@@ -115,11 +115,9 @@ namespace Web_XuongMay.Migrations
 
             modelBuilder.Entity("Web_XuongMay.Data.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .IsRequired()
