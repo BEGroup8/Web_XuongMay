@@ -1,4 +1,7 @@
-﻿using Web_XuongMay.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Web_XuongMay.Data;
 using Web_XuongMay.Models;
 using Web_XuongMay.Services;
 
@@ -8,73 +11,78 @@ public class LoaiRepository : ILoaiRepository
 {
     private readonly MyDbContext _context;
 
-    public LoaiRepository(MyDbContext context)
-    {
-        _context = context;
-    }
+        public LoaiRepository(MyDbContext context)
+        {
+            _context = context;
+        }
 
-    public List<LoaiVM> GetAll()
-    {
-        return _context.Loais
-            .Select(loai => new LoaiVM
+        public LoaiVM Add(LoaiModel loaiModel)
+        {
+            var loai = new Loai
+            {
+                MaLoai = Guid.NewGuid(),  // Tạo GUID mới cho MaLoai
+                TenLoai = loaiModel.TenLoai
+            };
+
+            _context.Loais.Add(loai);
+            _context.SaveChanges();
+
+            return new LoaiVM
             {
                 MaLoai = loai.MaLoai,
                 TenLoai = loai.TenLoai
-            })
-            .ToList();
-    }
+            };
+        }
 
-    public LoaiVM GetById(Guid id)
-    {
-        var loai = _context.Loais
-            .Where(l => l.MaLoai == id)
-            .Select(l => new LoaiVM
+        public void Add(Loai loai)
+        {
+            // Phương thức này không được sử dụng trong mã hiện tại
+            throw new NotImplementedException();
+        }
+
+        public void Delete(Guid id)
+        {
+            var loai = _context.Loais.SingleOrDefault(x => x.MaLoai == id);
+            if (loai != null)
             {
-                MaLoai = l.MaLoai,
-                TenLoai = l.TenLoai
-            })
-            .FirstOrDefault();
+                _context.Loais.Remove(loai);
+                _context.SaveChanges();
+            }
+        }
 
-        return loai;
-    }
-
-    public LoaiVM Add(LoaiModel loaiModel)
-    {
-        var loai = new Loai
+        public List<LoaiVM> GetAll()
         {
-            MaLoai = Guid.NewGuid(),
-            TenLoai = loaiModel.TenLoai
-        };
+            var loais = _context.Loais.Select(x => new LoaiVM
+            {
+                MaLoai = x.MaLoai,
+                TenLoai = x.TenLoai
+            });
 
-        _context.Loais.Add(loai);
-        _context.SaveChanges();
+            return loais.ToList();
+        }
 
-        return new LoaiVM
+        public LoaiVM GetById(Guid id)
         {
-            MaLoai = loai.MaLoai,
-            TenLoai = loai.TenLoai
-        };
-    }
+            var loai = _context.Loais.SingleOrDefault(x => x.MaLoai == id);
+            if (loai != null)
+            {
+                return new LoaiVM
+                {
+                    MaLoai = loai.MaLoai,
+                    TenLoai = loai.TenLoai
+                };
+            }
             return null;
         }
 
-    public void Update(LoaiVM loaiVM)
-    {
-        var loai = _context.Loais.Find(loaiVM.MaLoai);
-        if (loai != null)
+        public void Update(LoaiVM loaiVm)
         {
-            loai.TenLoai = loaiVM.TenLoai;
-            _context.SaveChanges();
-        }
-    }
-
-    public void Delete(Guid id)
-    {
-        var loai = _context.Loais.Find(id);
-        if (loai != null)
-        {
-            _context.Loais.Remove(loai);
-            _context.SaveChanges();
+            var loai = _context.Loais.SingleOrDefault(x => x.MaLoai == loaiVm.MaLoai);
+            if (loai != null)
+            {
+                loai.TenLoai = loaiVm.TenLoai;
+                _context.SaveChanges();
+            }
         }
     }
 }
