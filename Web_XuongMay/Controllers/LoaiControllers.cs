@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Web_XuongMay.Data;
-using Web_XuongMay.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Web_XuongMay.Models;
+using Web_XuongMay.Services;
 
 namespace Web_XuongMay.Controllers
 {
@@ -13,10 +12,12 @@ namespace Web_XuongMay.Controllers
     [ApiController]
     public class LoaiControllers : ControllerBase
     {
+        private readonly ILoaiRepository _loaiRepository;
         private readonly MyDbContext _context;
 
-        public LoaiControllers(MyDbContext context)
+        public LoaiControllers(ILoaiRepository loaiRepository, MyDbContext context)
         {
+            _loaiRepository = loaiRepository;
             _context = context;
         }
 
@@ -24,22 +25,35 @@ namespace Web_XuongMay.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var dsLoai = _context.Loais.ToList();
-            return Ok(dsLoai);
+            try
+            {
+                return Ok(_loaiRepository.GetAll());
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         // Get Loai by Id
         [HttpGet("{id}")]
         public IActionResult GetById(Guid id)  // Sử dụng Guid cho id
         {
-            var loai = _context.Loais.SingleOrDefault(lo => lo.MaLoai == id);
-            if (loai != null)
+            try
             {
-                return Ok(loai);
+                var loai = _loaiRepository.GetById(id);
+                if (loai != null)
+                {
+                    return Ok(loai);
+                }
+                else
+                {
+                    return NotFound();
+                }
             }
-            else
+            catch
             {
-                return NotFound();
+                return BadRequest();
             }
         }
 
@@ -60,9 +74,7 @@ namespace Web_XuongMay.Controllers
                     TenLoai = model.TenLoai
                 };
 
-                _context.Loais.Add(loai);
-                _context.SaveChanges();
-
+                _loaiRepository.Add(loai);
                 return CreatedAtAction(nameof(GetById), new { id = loai.MaLoai }, loai);
             }
             catch (Exception ex)
@@ -73,55 +85,50 @@ namespace Web_XuongMay.Controllers
 
         // Update Loai by Id
         [HttpPut("{id}")]
-        public IActionResult UpdateLoaiById(Guid id, [FromBody] LoaiModel model)  // Sử dụng Guid cho id
+        public IActionResult Update(Guid id, [FromBody] LoaiModel model)
         {
             if (model == null)
             {
                 return BadRequest("Invalid data.");
             }
 
-            var loai = _context.Loais.SingleOrDefault(lo => lo.MaLoai == id);
-            if (loai != null)
+            try
             {
-                loai.TenLoai = model.TenLoai;
+                var loai = _loaiRepository.GetById(id);
+                if (loai == null)
+                {
+                    return NotFound();
+                }
 
-                try
-                {
-                    _context.SaveChanges();
-                    return NoContent();
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest($"Error occurred: {ex.Message}");
-                }
+                loai.TenLoai = model.TenLoai;
+                _loaiRepository.Update(loai);
+
+                return NoContent();
             }
-            else
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest($"Error occurred: {ex.Message}");
             }
         }
 
         // Delete Loai by Id
         [HttpDelete("{id}")]
-        public IActionResult DeleteLoaiById(Guid id)  // Sử dụng Guid cho id
+        public IActionResult Delete(Guid id)
         {
-            var loai = _context.Loais.SingleOrDefault(lo => lo.MaLoai == id);
-            if (loai != null)
+            try
             {
-                try
+                var loai = _loaiRepository.GetById(id);
+                if (loai == null)
                 {
-                    _context.Loais.Remove(loai);
-                    _context.SaveChanges();
-                    return NoContent();
+                    return NotFound();
                 }
-                catch (Exception ex)
-                {
-                    return BadRequest($"Error occurred: {ex.Message}");
-                }
+
+                _loaiRepository.Delete(id);
+                return NoContent();
             }
-            else
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest($"Error occurred: {ex.Message}");
             }
         }
     }
