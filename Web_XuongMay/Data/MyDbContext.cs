@@ -48,6 +48,14 @@ namespace Web_XuongMay.Data
                 entity.Property(e => e.TotalAmount)
                     .HasColumnType("decimal(18,2)");
             });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasIndex(e => e.UserName).IsUnique();
+                entity.Property(e => e.FullName).IsRequired().HasMaxLength(150);
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(150);
+
+            });
         }
 
     }

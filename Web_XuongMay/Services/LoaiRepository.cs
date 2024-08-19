@@ -25,7 +25,12 @@ namespace Web_XuongMay.Services
             };
         }
 
-        public void Delete(int id)
+        public void Add(Loai loai)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Delete(Guid id)
         {
             var loai = _context.Loais.SingleOrDefault(x => x.MaLoai == id);
             if (loai != null)
@@ -45,7 +50,7 @@ namespace Web_XuongMay.Services
             return loais.ToList();
         }
 
-        public LoaiVM GetById(int id)
+        public LoaiVM GetById(Guid id)
         {
             var loai = _context.Loais.SingleOrDefault(x =>  x.MaLoai == id);
             if (loai != null)
@@ -59,11 +64,15 @@ namespace Web_XuongMay.Services
             return null;
         }
 
+
         public void Update(LoaiVM loai)
         {
             var _loai = _context.Loais.SingleOrDefault(x => x.MaLoai == loai.MaLoai);
             loai.TenLoai = loai.TenLoai;
             _context.SaveChanges();
         }
+
+       
+       
     }
 }

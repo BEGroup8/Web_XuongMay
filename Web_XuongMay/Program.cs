@@ -27,7 +27,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateAudience = false,
 
         ValidateIssuerSigningKey = false,
-        IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes)
+        IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+        ClockSkew = TimeSpan.Zero
     };
 });
 
@@ -45,6 +46,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
