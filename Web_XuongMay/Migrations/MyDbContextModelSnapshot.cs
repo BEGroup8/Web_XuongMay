@@ -22,41 +22,35 @@ namespace Web_XuongMay.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Web_XuongMay.Data.Catagory", b =>
+            modelBuilder.Entity("OrderProduct", b =>
                 {
-                    b.Property<Guid>("Mahh")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<double>("DonGia")
-                        .HasColumnType("float");
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("MaLoai")
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<string>("Mota")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("Id");
 
-                    b.Property<string>("Tenhang")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.HasIndex("OrderId");
 
-                    b.HasKey("Mahh");
+                    b.HasIndex("ProductId");
 
-                    b.HasIndex("MaLoai");
-
-                    b.ToTable("Catagory");
+                    b.ToTable("OrderProducts");
                 });
 
             modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
                 {
-                    b.Property<int>("MaLoai")
+                    b.Property<Guid>("MaLoai")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaLoai"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("TenLoai")
                         .IsRequired()
@@ -70,9 +64,10 @@ namespace Web_XuongMay.Migrations
 
             modelBuilder.Entity("Web_XuongMay.Data.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("OrderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("OrderId");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -84,33 +79,19 @@ namespace Web_XuongMay.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderId");
 
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("Web_XuongMay.Data.OrderProduct", b =>
-                {
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderId", "ProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrderProducts");
                 });
 
             modelBuilder.Entity("Web_XuongMay.Data.Products", b =>
                 {
                     b.Property<Guid>("MaHH")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("MaHH");
+
+                    b.Property<Guid>("MaLoai")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("MoTa")
@@ -123,6 +104,8 @@ namespace Web_XuongMay.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("MaHH");
+
+                    b.HasIndex("MaLoai");
 
                     b.ToTable("Products");
                 });
@@ -137,13 +120,11 @@ namespace Web_XuongMay.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -157,31 +138,19 @@ namespace Web_XuongMay.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserName")
-                        .IsUnique();
-
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("Web_XuongMay.Data.Catagory", b =>
-                {
-                    b.HasOne("Web_XuongMay.Data.Loai", "Loai")
-                        .WithMany("Catagories")
-                        .HasForeignKey("MaLoai");
-
-                    b.Navigation("Loai");
-                });
-
-            modelBuilder.Entity("Web_XuongMay.Data.OrderProduct", b =>
+            modelBuilder.Entity("OrderProduct", b =>
                 {
                     b.HasOne("Web_XuongMay.Data.Order", "Order")
-                        .WithMany("OrderProducts")
+                        .WithMany()
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Web_XuongMay.Data.Products", "Product")
-                        .WithMany("OrderProducts")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -191,19 +160,20 @@ namespace Web_XuongMay.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
-                {
-                    b.Navigation("Catagories");
-                });
-
-            modelBuilder.Entity("Web_XuongMay.Data.Order", b =>
-                {
-                    b.Navigation("OrderProducts");
-                });
-
             modelBuilder.Entity("Web_XuongMay.Data.Products", b =>
                 {
-                    b.Navigation("OrderProducts");
+                    b.HasOne("Web_XuongMay.Data.Loai", "Loai")
+                        .WithMany("Products")
+                        .HasForeignKey("MaLoai")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Loai");
+                });
+
+            modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

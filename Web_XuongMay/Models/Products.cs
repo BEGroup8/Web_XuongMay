@@ -1,6 +1,16 @@
-﻿namespace Web_XuongMay.Models
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace Web_XuongMay.Models
 {
-    public class Products
+    public class ProductsVM
     {
+        [Required]
+        public string TenHangHoa { get; set; }
+
+        public string Mota { get; set; }
+
+        [Required]
+        public Guid MaLoai { get; set; }  // Khóa ngoại
     }
 }
