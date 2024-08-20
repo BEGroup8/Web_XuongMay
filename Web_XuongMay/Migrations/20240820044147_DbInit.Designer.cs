@@ -12,7 +12,7 @@ using Web_XuongMay.Data;
 namespace Web_XuongMay.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240819041314_DbInit")]
+    [Migration("20240820044147_DbInit")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -47,6 +47,21 @@ namespace Web_XuongMay.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("OrderProducts");
+                });
+
+            modelBuilder.Entity("Web_XuongMay.Data.Chuyen", b =>
+                {
+                    b.Property<Guid>("ChuyenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ChuyenName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ChuyenId");
+
+                    b.ToTable("Chuyens");
                 });
 
             modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
@@ -113,6 +128,31 @@ namespace Web_XuongMay.Migrations
                     b.ToTable("Products");
                 });
 
+            modelBuilder.Entity("Web_XuongMay.Data.TaskOrder", b =>
+                {
+                    b.Property<Guid>("TaskId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChuyenId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OrderProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TaskId");
+
+                    b.HasIndex("ChuyenId");
+
+                    b.HasIndex("OrderProductId");
+
+                    b.ToTable("TaskOrders");
+                });
+
             modelBuilder.Entity("Web_XuongMay.Data.User", b =>
                 {
                     b.Property<int>("Id")
@@ -166,7 +206,7 @@ namespace Web_XuongMay.Migrations
             modelBuilder.Entity("Web_XuongMay.Data.Products", b =>
                 {
                     b.HasOne("Web_XuongMay.Data.Loai", "Loai")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("MaLoai")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -174,9 +214,23 @@ namespace Web_XuongMay.Migrations
                     b.Navigation("Loai");
                 });
 
-            modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
+            modelBuilder.Entity("Web_XuongMay.Data.TaskOrder", b =>
                 {
-                    b.Navigation("Products");
+                    b.HasOne("Web_XuongMay.Data.Chuyen", "Chuyen")
+                        .WithMany()
+                        .HasForeignKey("ChuyenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OrderProduct", "OrderProduct")
+                        .WithMany()
+                        .HasForeignKey("OrderProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chuyen");
+
+                    b.Navigation("OrderProduct");
                 });
 #pragma warning restore 612, 618
         }

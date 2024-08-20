@@ -12,6 +12,18 @@ namespace Web_XuongMay.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Chuyens",
+                columns: table => new
+                {
+                    ChuyenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ChuyenName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Chuyens", x => x.ChuyenId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Loai",
                 columns: table => new
                 {
@@ -99,6 +111,32 @@ namespace Web_XuongMay.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TaskOrders",
+                columns: table => new
+                {
+                    TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TaskName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ChuyenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TaskOrders", x => x.TaskId);
+                    table.ForeignKey(
+                        name: "FK_TaskOrders_Chuyens_ChuyenId",
+                        column: x => x.ChuyenId,
+                        principalTable: "Chuyens",
+                        principalColumn: "ChuyenId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TaskOrders_OrderProducts_OrderProductId",
+                        column: x => x.OrderProductId,
+                        principalTable: "OrderProducts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_OrderProducts_OrderId",
                 table: "OrderProducts",
@@ -113,16 +151,32 @@ namespace Web_XuongMay.Migrations
                 name: "IX_Products_MaLoai",
                 table: "Products",
                 column: "MaLoai");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaskOrders_ChuyenId",
+                table: "TaskOrders",
+                column: "ChuyenId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaskOrders_OrderProductId",
+                table: "TaskOrders",
+                column: "OrderProductId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OrderProducts");
+                name: "TaskOrders");
 
             migrationBuilder.DropTable(
                 name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Chuyens");
+
+            migrationBuilder.DropTable(
+                name: "OrderProducts");
 
             migrationBuilder.DropTable(
                 name: "Orders");

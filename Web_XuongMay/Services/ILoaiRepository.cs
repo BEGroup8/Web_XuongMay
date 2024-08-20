@@ -1,18 +1,10 @@
 ﻿using Web_XuongMay.Data;
-using Web_XuongMay.Models;
 
-namespace Web_XuongMay.Services
+public interface ILoaiRepository
 {
-    public interface ILoaiRepository
-    {
-        List<LoaiVM> GetAll();
-        LoaiVM GetById(Guid id);
-        LoaiVM Add(LoaiModel loai);
-        void Update(LoaiVM loai);
-
-        void Delete(Guid id);
-        void Add(Loai loai);
-
-
-    }
+    IEnumerable<Loai> GetAll();
+    Loai GetById(Guid id);
+    void Add(Loai loai);
+    void Update(Loai loai);
+    void Delete(Guid id);
 }

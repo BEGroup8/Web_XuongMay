@@ -23,9 +23,19 @@ namespace Web_XuongMay.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var orderproducts = _context.OrderProducts.ToList();
-            return Ok(orderproducts);
+            try
+            {
+                var orderproducts = _context.OrderProducts
+                    .Include(op => op.Product) // Đảm bảo rằng các thuộc tính điều hướng được bao gồm
+                    .ToList();
+                return Ok(orderproducts);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Lỗi khi lấy danh sách OrderProducts. Lỗi: {ex.Message}");
+            }
         }
+
 
         [HttpGet("{orderId}")]
         public IActionResult GetById(Guid orderId)
@@ -71,13 +81,7 @@ namespace Web_XuongMay.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                // Chỉ định chính xác tên hành động và các tham số tuyến đường
                 return CreatedAtAction(nameof(GetById), new { orderId = order.OrderId }, order);
-            }
-            catch (DbUpdateException dbEx)
-            {
-                var sqlError = dbEx.InnerException?.Message ?? dbEx.Message;
-                return BadRequest($"Không thể tạo đơn hàng. Lỗi cơ sở dữ liệu: {sqlError}");
             }
             catch (Exception ex)
             {
