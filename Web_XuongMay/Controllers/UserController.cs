@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http;
@@ -49,12 +49,34 @@ namespace Web_XuongMay.Controllers
             });
         }
 
-        // Method to get all users
+        // Method to get all users with pagination
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll(int pageNumber = 1, int pageSize = 10)
         {
-            var users = _context.Users.ToList();
-            return Ok(users);
+            try
+            {
+                var totalRecords = _context.Users.Count();
+
+                var users = _context.Users
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                var paginationResult = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalRecords = totalRecords,
+                    TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize),
+                    Data = users
+                };
+
+                return Ok(paginationResult);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error occurred: {ex.Message}");
+            }
         }
 
         // Method to get user by ID

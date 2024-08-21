@@ -21,21 +21,37 @@ namespace Web_XuongMay.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll(int pageNumber = 1, int pageSize = 10)
         {
             try
             {
+                // Tổng số lượng OrderProducts
+                var totalRecords = _context.OrderProducts.Count();
+
+                // Lấy danh sách OrderProducts với phân trang
                 var orderproducts = _context.OrderProducts
                     .Include(op => op.Product) // Đảm bảo rằng các thuộc tính điều hướng được bao gồm
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .ToList();
-                return Ok(orderproducts);
+
+                // Tạo object chứa dữ liệu phân trang
+                var paginationResult = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalRecords = totalRecords,
+                    TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize),
+                    Data = orderproducts
+                };
+
+                return Ok(paginationResult);
             }
             catch (Exception ex)
             {
                 return BadRequest($"Lỗi khi lấy danh sách OrderProducts. Lỗi: {ex.Message}");
             }
         }
-
 
         [HttpGet("{orderId}")]
         public IActionResult GetById(Guid orderId)
@@ -48,6 +64,7 @@ namespace Web_XuongMay.Controllers
 
             return Ok(order);
         }
+
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] OrderModel orderModel)
         {
@@ -88,6 +105,7 @@ namespace Web_XuongMay.Controllers
                 return BadRequest($"Không thể tạo đơn hàng. Lỗi: {ex.Message}");
             }
         }
+
         [HttpPut("{id}")]
         public IActionResult UpdateOrderProduct(Guid id, [FromBody] OrderProduct updatedOrderProduct)
         {
@@ -135,6 +153,5 @@ namespace Web_XuongMay.Controllers
                 return BadRequest($"Failed to delete order product. Error: {ex.Message}");
             }
         }
-
     }
 }

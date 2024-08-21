@@ -12,7 +12,7 @@ using Web_XuongMay.Data;
 namespace Web_XuongMay.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240821062501_DbInit")]
+    [Migration("20240821070116_DbInit")]
     partial class DbInit
     {
         /// <inheritdoc />

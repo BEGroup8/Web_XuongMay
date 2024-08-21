@@ -20,15 +20,39 @@ namespace Web_XuongMay.Controllers
             _context = context;
         }
 
-        // Lấy tất cả các Task
+        // Lấy tất cả các Task với phân trang
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll(int pageNumber = 1, int pageSize = 10)
         {
-            var tasks = _context.TaskOrders
-                .Include(t => t.Line)
-                .Include(t => t.OrderProduct)
-                .ToList();
-            return Ok(tasks);
+            try
+            {
+                // Tổng số lượng Task
+                var totalRecords = _context.TaskOrders.Count();
+
+                // Lấy danh sách Task với phân trang
+                var tasks = _context.TaskOrders
+                    .Include(t => t.Line)
+                    .Include(t => t.OrderProduct)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // Tạo object chứa dữ liệu phân trang
+                var paginationResult = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalRecords = totalRecords,
+                    TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize),
+                    Data = tasks
+                };
+
+                return Ok(paginationResult); // Trả về kết quả với HTTP 200 OK
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error occurred: {ex.Message}");
+            }
         }
 
         // Lấy Task theo ID
@@ -114,6 +138,8 @@ namespace Web_XuongMay.Controllers
                 return BadRequest($"Không thể cập nhật Task. Lỗi: {ex.Message}");
             }
         }
+
+        // Xóa một Task
         [HttpDelete("{taskId}")]
         public async Task<IActionResult> DeleteTask(Guid taskId)
         {

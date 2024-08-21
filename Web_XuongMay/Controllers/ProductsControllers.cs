@@ -20,13 +20,40 @@ namespace Web_XuongMay.Controllers
             _context = context;
         }
 
+        // GET: api/Products
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll(int pageNumber = 1, int pageSize = 10)
         {
-            var products = _context.Products.ToList();
-            return Ok(products);
+            try
+            {
+                // Tổng số lượng Products
+                var totalRecords = _context.Products.Count();
+
+                // Lấy danh sách Products với phân trang
+                var products = _context.Products
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // Tạo object chứa dữ liệu phân trang
+                var paginationResult = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalRecords = totalRecords,
+                    TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize),
+                    Data = products
+                };
+
+                return Ok(paginationResult); // Trả về kết quả với HTTP 200 OK
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error occurred: {ex.Message}");
+            }
         }
 
+        // GET: api/Products/{id}
         [HttpGet("{id}")]
         public IActionResult GetById(Guid id)
         {
@@ -38,6 +65,7 @@ namespace Web_XuongMay.Controllers
             return Ok(product);
         }
 
+        // POST: api/Products
         [HttpPost]
         public IActionResult Create(ProductsVM productVM)
         {
@@ -55,6 +83,7 @@ namespace Web_XuongMay.Controllers
             return CreatedAtAction(nameof(GetById), new { id = product.MaHH }, product);
         }
 
+        // PUT: api/Products/{id}
         [HttpPut("{id}")]
         public IActionResult Edit(Guid id, Products hangHoaEdit)
         {
@@ -81,6 +110,7 @@ namespace Web_XuongMay.Controllers
             }
         }
 
+        // DELETE: api/Products/{id}
         [HttpDelete("{id}")]
         public IActionResult Remove(Guid id)
         {

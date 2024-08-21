@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Web_XuongMay.Data;
 using Web_XuongMay.Models;
 using Web_XuongMay.Services;
@@ -22,23 +21,43 @@ namespace Web_XuongMay.Controllers
             _context = context;
         }
 
-        // Get all Loai
+        // GET: api/Loai
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll(int pageNumber = 1, int pageSize = 10)
         {
             try
             {
-                return Ok(_loaiRepository.GetAll());
+                // Tổng số lượng Loai
+                var totalRecords = _loaiRepository.GetAll().Count();
+
+                // Lấy danh sách Loai với phân trang
+                var dsLoai = _loaiRepository.GetAll()
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // Tạo object chứa dữ liệu phân trang
+                var paginationResult = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalRecords = totalRecords,
+                    TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize),
+                    Data = dsLoai
+                };
+
+                return Ok(paginationResult); // Trả về kết quả với HTTP 200 OK
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                // Trả về lỗi nếu có vấn đề xảy ra
+                return BadRequest($"Error occurred: {ex.Message}");
             }
         }
 
-        // Get Loai by Id
+        // GET: api/Loai/{id}
         [HttpGet("{id}")]
-        public IActionResult GetById(Guid id)  // Sử dụng Guid cho id
+        public IActionResult GetById(Guid id)
         {
             try
             {
@@ -52,30 +71,31 @@ namespace Web_XuongMay.Controllers
                     return NotFound();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest($"Error occurred: {ex.Message}");
             }
         }
 
-        // Create a new Loai
+        // POST: api/Loai
         [HttpPost]
         public IActionResult CreateNew([FromBody] LoaiModel model)
         {
-            if (model == null)
+            if (model == null || string.IsNullOrWhiteSpace(model.TenLoai))
             {
-                return BadRequest("Invalid data.");
+                return BadRequest("Invalid data. TenLoai is required.");
             }
 
             try
             {
                 var loai = new Loai
                 {
-                    MaLoai = Guid.NewGuid(),  // Tạo Guid mới cho khóa chính
+                    MaLoai = Guid.NewGuid(),
                     TenLoai = model.TenLoai
                 };
 
                 _loaiRepository.Add(loai);
+
                 return CreatedAtAction(nameof(GetById), new { id = loai.MaLoai }, loai);
             }
             catch (Exception ex)
@@ -84,11 +104,11 @@ namespace Web_XuongMay.Controllers
             }
         }
 
-        // Update Loai by Id
+        // PUT: api/Loai/{id}
         [HttpPut("{id}")]
         public IActionResult Update(Guid id, [FromBody] LoaiModel model)
         {
-            if (model == null)
+            if (model == null || string.IsNullOrWhiteSpace(model.TenLoai))
             {
                 return BadRequest("Invalid data.");
             }
@@ -112,7 +132,7 @@ namespace Web_XuongMay.Controllers
             }
         }
 
-        // Delete Loai by Id
+        // DELETE: api/Loai/{id}
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {

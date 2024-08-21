@@ -41,6 +41,11 @@ namespace Web_XuongMay.Services
             _context.SaveChanges();
         }
 
+        public double Count()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Delete(Guid id)
         {
             var loai = _context.Loais.SingleOrDefault(x => x.MaLoai == id);
