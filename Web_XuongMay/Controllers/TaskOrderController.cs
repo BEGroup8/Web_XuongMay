@@ -25,7 +25,7 @@ namespace Web_XuongMay.Controllers
         public IActionResult GetAll()
         {
             var tasks = _context.TaskOrders
-                .Include(t => t.Chuyen)
+                .Include(t => t.Line)
                 .Include(t => t.OrderProduct)
                 .ToList();
             return Ok(tasks);
@@ -36,7 +36,7 @@ namespace Web_XuongMay.Controllers
         public IActionResult GetById(Guid taskId)
         {
             var task = _context.TaskOrders
-                .Include(t => t.Chuyen)
+                .Include(t => t.Line)
                 .Include(t => t.OrderProduct)
                 .SingleOrDefault(t => t.TaskId == taskId);
 
@@ -62,7 +62,7 @@ namespace Web_XuongMay.Controllers
             {
                 TaskId = Guid.NewGuid(), // Tạo ID mới cho Task
                 TaskName = taskModel.TaskName,
-                ChuyenId = taskModel.ChuyenId,
+                ChuyenId = taskModel.LineId,
                 OrderProductId = taskModel.OrderProductId
             };
 
@@ -102,7 +102,7 @@ namespace Web_XuongMay.Controllers
             try
             {
                 existingTask.TaskName = updatedTaskModel.TaskName;
-                existingTask.ChuyenId = updatedTaskModel.ChuyenId;
+                existingTask.ChuyenId = updatedTaskModel.LineId;
                 existingTask.OrderProductId = updatedTaskModel.OrderProductId;
 
                 _context.TaskOrders.Update(existingTask);

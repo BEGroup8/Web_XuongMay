@@ -10,7 +10,7 @@ namespace Web_XuongMay.Data
         public string TaskName { get; set; }
 
         public Guid ChuyenId { get; set; }
-        public Chuyen Chuyen { get; set; }
+        public Line Line { get; set; }
 
         public Guid OrderProductId { get; set; }
         public OrderProduct OrderProduct { get; set; }
