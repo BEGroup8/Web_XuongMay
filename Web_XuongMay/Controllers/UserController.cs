@@ -17,51 +17,56 @@ namespace Web_XuongMay.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly MyDbContext _context;
-        private readonly AppSetting _appSettings;
+        private readonly MyDbContext _context; // Đối tượng DbContext để làm việc với cơ sở dữ liệu
+        private readonly AppSetting _appSettings; // Đối tượng chứa các cấu hình từ AppSettings
 
-        // Constructor with IOptionsMonitor for AppSettings
+        // Constructor với IOptionsMonitor để lấy cấu hình từ AppSettings
         public UserController(MyDbContext context, IOptionsMonitor<AppSetting> optionsMonitor)
         {
-            _context = context;
-            _appSettings = optionsMonitor.CurrentValue;
+            _context = context; // Khởi tạo DbContext
+            _appSettings = optionsMonitor.CurrentValue; // Khởi tạo cấu hình ứng dụng
         }
 
-        // Method to validate login
+        // Phương thức để xác thực đăng nhập
         [HttpPost("Login")]
         public IActionResult Validate(LoginModel model)
         {
+            // Kiểm tra xem người dùng có tồn tại và mật khẩu có khớp không
             var user = _context.Users.SingleOrDefault(p => p.UserName == model.UserName && model.Password == p.Password);
             if (user == null)
             {
                 return Ok(new ApiResponse
                 {
                     Success = false,
-                    Message = "Invalid username or password"
+                    Message = "Invalid username or password" // Thông báo lỗi nếu thông tin đăng nhập không hợp lệ
                 });
             }
 
+            // Trả về kết quả thành công và JWT token nếu đăng nhập thành công
             return Ok(new ApiResponse
             {
                 Success = true,
                 Message = "Authenticate success",
-                Data = GenerateToken(user)
+                Data = GenerateToken(user) // Tạo và trả về JWT token
             });
         }
 
-        // Method to get all users with pagination
+        // Phương thức để lấy tất cả người dùng với phân trang
         [HttpGet]
         public IActionResult GetAll(int pageNumber = 1, int pageSize = 10)
         {
             try
             {
+                // Tính tổng số bản ghi người dùng
                 var totalRecords = _context.Users.Count();
 
+                // Lấy danh sách người dùng theo phân trang
                 var users = _context.Users
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
 
+                // Tạo đối tượng chứa dữ liệu phân trang
                 var paginationResult = new
                 {
                     PageNumber = pageNumber,
@@ -71,37 +76,39 @@ namespace Web_XuongMay.Controllers
                     Data = users
                 };
 
-                return Ok(paginationResult);
+                return Ok(paginationResult); // Trả về kết quả với HTTP 200 OK
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error occurred: {ex.Message}");
+                return BadRequest($"Error occurred: {ex.Message}"); // Trả về lỗi nếu có xảy ra ngoại lệ
             }
         }
 
-        // Method to get user by ID
+        // Phương thức để lấy thông tin người dùng theo ID
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
+            // Tìm người dùng theo ID
             var user = _context.Users.SingleOrDefault(u => u.Id == id);
             if (user == null)
             {
-                return NotFound($"User with ID {id} not found.");
+                return NotFound($"User with ID {id} not found."); // Trả về lỗi 404 nếu không tìm thấy người dùng
             }
-            return Ok(user);
+            return Ok(user); // Trả về thông tin người dùng nếu tìm thấy
         }
 
-        // Method to create a new user
+        // Phương thức để tạo một người dùng mới
         [HttpPost]
         public IActionResult CreateNew([FromBody] UserModel userModel)
         {
             if (userModel == null)
             {
-                return BadRequest("User data is null.");
+                return BadRequest("User data is null."); // Trả về lỗi nếu dữ liệu người dùng bị null
             }
 
             try
             {
+                // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
                 var hashedPassword = HashPassword(userModel.Password);
 
                 var user = new User
@@ -112,43 +119,46 @@ namespace Web_XuongMay.Controllers
                     Email = userModel.Email
                 };
 
+                // Thêm người dùng vào cơ sở dữ liệu và lưu thay đổi
                 _context.Users.Add(user);
                 _context.SaveChanges();
 
                 return Ok(new
                 {
                     Success = true,
-                    Data = user
+                    Data = user // Trả về thông tin người dùng mới tạo
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest($"Failed to create user. Error: {ex.Message}");
+                return BadRequest($"Failed to create user. Error: {ex.Message}"); // Trả về lỗi nếu không thể tạo người dùng
             }
         }
 
-        // Method to update user by ID
+        // Phương thức để cập nhật thông tin người dùng theo ID
         [HttpPut("{id}")]
         public IActionResult UpdateUserByID(int id, [FromBody] UserModel userModel)
         {
             if (userModel == null)
             {
-                return BadRequest("Invalid user data or ID.");
+                return BadRequest("Invalid user data or ID."); // Trả về lỗi nếu dữ liệu người dùng hoặc ID không hợp lệ
             }
 
+            // Tìm người dùng theo ID
             var user = _context.Users.SingleOrDefault(u => u.Id == id);
             if (user == null)
             {
-                return NotFound($"User with ID {id} not found.");
+                return NotFound($"User with ID {id} not found."); // Trả về lỗi 404 nếu không tìm thấy người dùng
             }
 
             try
             {
+                // Cập nhật thông tin người dùng
                 user.UserName = userModel.UserName;
                 user.FullName = userModel.FullName;
                 user.Email = userModel.Email;
 
-                // Only update the password if it is provided
+                // Chỉ cập nhật mật khẩu nếu nó được cung cấp
                 if (!string.IsNullOrEmpty(userModel.Password))
                 {
                     user.Password = HashPassword(userModel.Password);
@@ -156,47 +166,48 @@ namespace Web_XuongMay.Controllers
 
                 _context.Users.Update(user);
                 _context.SaveChanges();
-                return NoContent();
+                return NoContent(); // Trả về HTTP 204 No Content nếu cập nhật thành công
             }
             catch (Exception ex)
             {
-                return BadRequest($"Failed to update user. Error: {ex.Message}");
+                return BadRequest($"Failed to update user. Error: {ex.Message}"); // Trả về lỗi nếu không thể cập nhật người dùng
             }
         }
 
-        // Method to delete user by ID
+        // Phương thức để xóa người dùng theo ID
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(int id)
         {
+            // Tìm người dùng theo ID
             var user = _context.Users.SingleOrDefault(u => u.Id == id);
             if (user == null)
             {
-                return NotFound($"User with ID {id} not found.");
+                return NotFound($"User with ID {id} not found."); // Trả về lỗi 404 nếu không tìm thấy người dùng
             }
 
             try
             {
                 _context.Users.Remove(user);
                 _context.SaveChanges();
-                return NoContent();
+                return NoContent(); // Trả về HTTP 204 No Content nếu xóa thành công
             }
             catch (Exception ex)
             {
-                return BadRequest($"Failed to delete user. Error: {ex.Message}");
+                return BadRequest($"Failed to delete user. Error: {ex.Message}"); // Trả về lỗi nếu không thể xóa người dùng
             }
         }
 
-        // Helper method to hash passwords
+        // Phương thức trợ giúp để mã hóa mật khẩu
         private string HashPassword(string password)
         {
             using (var hmac = new HMACSHA256())
             {
                 var hashedBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
+                return Convert.ToBase64String(hashedBytes); // Trả về mật khẩu đã mã hóa dưới dạng chuỗi base64
             }
         }
 
-        // Method to generate JWT token
+        // Phương thức để tạo JWT token
         private string GenerateToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -211,12 +222,12 @@ namespace Web_XuongMay.Controllers
                     new Claim("Id", user.Id.ToString()),
                     new Claim("TokenId", Guid.NewGuid().ToString())
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Expires = DateTime.UtcNow.AddMinutes(1), // Thời gian hết hạn của token
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeyBytes), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = jwtTokenHandler.CreateToken(tokenDescription);
 
-            return jwtTokenHandler.WriteToken(token);
+            return jwtTokenHandler.WriteToken(token); // Trả về token dưới dạng chuỗi
         }
     }
 }
