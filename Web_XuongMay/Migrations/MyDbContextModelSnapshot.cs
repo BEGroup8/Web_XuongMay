@@ -46,6 +46,27 @@ namespace Web_XuongMay.Migrations
                     b.ToTable("OrderProducts");
                 });
 
+            modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
+                {
+                    b.Property<Guid>("LineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NameLine")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("LineId");
+
+                    b.HasIndex("Id");
+
+                    b.ToTable("Line");
+                });
+
             modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
                 {
                     b.Property<Guid>("MaLoai")
@@ -112,9 +133,11 @@ namespace Web_XuongMay.Migrations
 
             modelBuilder.Entity("Web_XuongMay.Data.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -161,6 +184,17 @@ namespace Web_XuongMay.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
+                {
+                    b.HasOne("Web_XuongMay.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Web_XuongMay.Data.Products", b =>

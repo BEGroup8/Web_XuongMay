@@ -16,6 +16,8 @@ namespace Web_XuongMay.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<Products> Products { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
+         
+        public DbSet<Line> Lines { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
