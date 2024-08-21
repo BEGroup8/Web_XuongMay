@@ -62,7 +62,7 @@ namespace Web_XuongMay.Controllers
             {
                 TaskId = Guid.NewGuid(), // Tạo ID mới cho Task
                 TaskName = taskModel.TaskName,
-                ChuyenId = taskModel.LineId,
+                LineId = taskModel.LineId,
                 OrderProductId = taskModel.OrderProductId
             };
 
@@ -102,7 +102,7 @@ namespace Web_XuongMay.Controllers
             try
             {
                 existingTask.TaskName = updatedTaskModel.TaskName;
-                existingTask.ChuyenId = updatedTaskModel.LineId;
+                existingTask.LineId = updatedTaskModel.LineId;
                 existingTask.OrderProductId = updatedTaskModel.OrderProductId;
 
                 _context.TaskOrders.Update(existingTask);

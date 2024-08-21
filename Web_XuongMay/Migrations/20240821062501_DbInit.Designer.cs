@@ -12,7 +12,7 @@ using Web_XuongMay.Data;
 namespace Web_XuongMay.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240820044147_DbInit")]
+    [Migration("20240821062501_DbInit")]
     partial class DbInit
     {
         /// <inheritdoc />
@@ -49,19 +49,25 @@ namespace Web_XuongMay.Migrations
                     b.ToTable("OrderProducts");
                 });
 
-            modelBuilder.Entity("Web_XuongMay.Data.Chuyen", b =>
+            modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
                 {
-                    b.Property<Guid>("ChuyenId")
+                    b.Property<Guid>("LineId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ChuyenName")
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NameLine")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("ChuyenId");
+                    b.HasKey("LineId");
 
-                    b.ToTable("Chuyens");
+                    b.HasIndex("Id");
+
+                    b.ToTable("Line");
                 });
 
             modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
@@ -134,7 +140,7 @@ namespace Web_XuongMay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ChuyenId")
+                    b.Property<Guid>("LineId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("OrderProductId")
@@ -146,7 +152,7 @@ namespace Web_XuongMay.Migrations
 
                     b.HasKey("TaskId");
 
-                    b.HasIndex("ChuyenId");
+                    b.HasIndex("LineId");
 
                     b.HasIndex("OrderProductId");
 
@@ -163,11 +169,13 @@ namespace Web_XuongMay.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -180,6 +188,9 @@ namespace Web_XuongMay.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
 
                     b.ToTable("User");
                 });
@@ -203,6 +214,17 @@ namespace Web_XuongMay.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
+                {
+                    b.HasOne("Web_XuongMay.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Web_XuongMay.Data.Products", b =>
                 {
                     b.HasOne("Web_XuongMay.Data.Loai", "Loai")
@@ -216,9 +238,9 @@ namespace Web_XuongMay.Migrations
 
             modelBuilder.Entity("Web_XuongMay.Data.TaskOrder", b =>
                 {
-                    b.HasOne("Web_XuongMay.Data.Chuyen", "Chuyen")
+                    b.HasOne("Web_XuongMay.Data.Line", "Line")
                         .WithMany()
-                        .HasForeignKey("ChuyenId")
+                        .HasForeignKey("LineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -228,7 +250,7 @@ namespace Web_XuongMay.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Chuyen");
+                    b.Navigation("Line");
 
                     b.Navigation("OrderProduct");
                 });

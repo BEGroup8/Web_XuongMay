@@ -12,18 +12,6 @@ namespace Web_XuongMay.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Chuyens",
-                columns: table => new
-                {
-                    ChuyenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ChuyenName = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Chuyens", x => x.ChuyenId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Loai",
                 columns: table => new
                 {
@@ -57,8 +45,8 @@ namespace Web_XuongMay.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -82,6 +70,25 @@ namespace Web_XuongMay.Migrations
                         column: x => x.MaLoai,
                         principalTable: "Loai",
                         principalColumn: "MaLoai",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Line",
+                columns: table => new
+                {
+                    LineId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NameLine = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Line", x => x.LineId);
+                    table.ForeignKey(
+                        name: "FK_Line_User_Id",
+                        column: x => x.Id,
+                        principalTable: "User",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -117,17 +124,17 @@ namespace Web_XuongMay.Migrations
                 {
                     TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TaskName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ChuyenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LineId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OrderProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TaskOrders", x => x.TaskId);
                     table.ForeignKey(
-                        name: "FK_TaskOrders_Chuyens_ChuyenId",
-                        column: x => x.ChuyenId,
-                        principalTable: "Chuyens",
-                        principalColumn: "ChuyenId",
+                        name: "FK_TaskOrders_Line_LineId",
+                        column: x => x.LineId,
+                        principalTable: "Line",
+                        principalColumn: "LineId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TaskOrders_OrderProducts_OrderProductId",
@@ -136,6 +143,11 @@ namespace Web_XuongMay.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Line_Id",
+                table: "Line",
+                column: "Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderProducts_OrderId",
@@ -153,14 +165,20 @@ namespace Web_XuongMay.Migrations
                 column: "MaLoai");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TaskOrders_ChuyenId",
+                name: "IX_TaskOrders_LineId",
                 table: "TaskOrders",
-                column: "ChuyenId");
+                column: "LineId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TaskOrders_OrderProductId",
                 table: "TaskOrders",
                 column: "OrderProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_UserName",
+                table: "User",
+                column: "UserName",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -170,13 +188,13 @@ namespace Web_XuongMay.Migrations
                 name: "TaskOrders");
 
             migrationBuilder.DropTable(
-                name: "User");
-
-            migrationBuilder.DropTable(
-                name: "Chuyens");
+                name: "Line");
 
             migrationBuilder.DropTable(
                 name: "OrderProducts");
+
+            migrationBuilder.DropTable(
+                name: "User");
 
             migrationBuilder.DropTable(
                 name: "Orders");
