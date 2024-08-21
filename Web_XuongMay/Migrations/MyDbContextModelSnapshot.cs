@@ -46,7 +46,6 @@ namespace Web_XuongMay.Migrations
                     b.ToTable("OrderProducts");
                 });
 
-
             modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
                 {
                     b.Property<Guid>("LineId")
@@ -138,7 +137,7 @@ namespace Web_XuongMay.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ChuyenId")
+                    b.Property<Guid>("LineId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("OrderProductId")
@@ -150,7 +149,7 @@ namespace Web_XuongMay.Migrations
 
                     b.HasKey("TaskId");
 
-                    b.HasIndex("ChuyenId");
+                    b.HasIndex("LineId");
 
                     b.HasIndex("OrderProductId");
 
@@ -236,9 +235,9 @@ namespace Web_XuongMay.Migrations
 
             modelBuilder.Entity("Web_XuongMay.Data.TaskOrder", b =>
                 {
-                    b.HasOne("Web_XuongMay.Data.Chuyen", "Chuyen")
+                    b.HasOne("Web_XuongMay.Data.Line", "Line")
                         .WithMany()
-                        .HasForeignKey("ChuyenId")
+                        .HasForeignKey("LineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -248,7 +247,7 @@ namespace Web_XuongMay.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Chuyen");
+                    b.Navigation("Line");
 
                     b.Navigation("OrderProduct");
                 });

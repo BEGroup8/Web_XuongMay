@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Web_XuongMay.Data;
@@ -15,30 +15,30 @@ namespace Web_XuongMay.Services
             _context = context;
         }
 
-        public IEnumerable<Loai> GetAll()
+        public LoaiVM Add(LoaiModel loaiModel)
         {
-            return _context.Loais.ToList();
-        }
+            var loai = new Loai
+            {
+                MaLoai = Guid.NewGuid(),  // Tạo GUID mới cho MaLoai
+                TenLoai = loaiModel.TenLoai
+            };
 
-        public Loai GetById(Guid id)
-        {
-            return _context.Loais.SingleOrDefault(x => x.MaLoai == id);
+            _context.Loais.Add(loai);
+            _context.SaveChanges();
+
+            return new LoaiVM
+            {
+                MaLoai = loai.MaLoai,
+                TenLoai = loai.TenLoai
+            };
         }
 
         public void Add(Loai loai)
         {
+            // Phương thức này không được sử dụng trong mã hiện tại
+            //throw new NotImplementedException();
             _context.Loais.Add(loai);
             _context.SaveChanges();
-        }
-
-        public void Update(Loai loai)
-        {
-            var existingLoai = _context.Loais.SingleOrDefault(x => x.MaLoai == loai.MaLoai);
-            if (existingLoai != null)
-            {
-                existingLoai.TenLoai = loai.TenLoai;
-                _context.SaveChanges();
-            }
         }
 
         public void Delete(Guid id)
@@ -47,6 +47,41 @@ namespace Web_XuongMay.Services
             if (loai != null)
             {
                 _context.Loais.Remove(loai);
+                _context.SaveChanges();
+            }
+        }
+
+        public List<LoaiVM> GetAll()
+        {
+            var loais = _context.Loais.Select(x => new LoaiVM
+            {
+                MaLoai = x.MaLoai,
+                TenLoai = x.TenLoai
+            });
+
+            return loais.ToList();
+        }
+
+        public LoaiVM GetById(Guid id)
+        {
+            var loai = _context.Loais.SingleOrDefault(x => x.MaLoai == id);
+            if (loai != null)
+            {
+                return new LoaiVM
+                {
+                    MaLoai = loai.MaLoai,
+                    TenLoai = loai.TenLoai
+                };
+            }
+            return null;
+        }
+
+        public void Update(LoaiVM loaiVm)
+        {
+            var loai = _context.Loais.SingleOrDefault(x => x.MaLoai == loaiVm.MaLoai);
+            if (loai != null)
+            {
+                loai.TenLoai = loaiVm.TenLoai;
                 _context.SaveChanges();
             }
         }
