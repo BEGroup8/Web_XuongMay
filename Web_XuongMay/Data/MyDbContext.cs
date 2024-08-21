@@ -16,8 +16,9 @@ namespace Web_XuongMay.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<Products> Products { get; set; }
         public DbSet<OrderProduct> OrderProducts { get; set; }
-        public DbSet<Chuyen> Chuyens { get; set; }
         public DbSet<TaskOrder> TaskOrders { get; set; }
+         
+        public DbSet<Line> Lines { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -49,6 +50,16 @@ namespace Web_XuongMay.Data
             {
                 entity.Property(e => e.TotalAmount)
                     .HasColumnType("decimal(18,2)");
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                
+                entity.HasIndex(e => e.UserName).IsUnique();
+                entity.Property(e => e.FullName).IsRequired().HasMaxLength(150);
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(150);
+
             });
         }
 

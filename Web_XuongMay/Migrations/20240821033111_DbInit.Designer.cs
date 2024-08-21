@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Web_XuongMay.Data;
 
@@ -11,9 +12,11 @@ using Web_XuongMay.Data;
 namespace Web_XuongMay.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240821033111_DbInit")]
+    partial class DbInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +48,6 @@ namespace Web_XuongMay.Migrations
 
                     b.ToTable("OrderProducts");
                 });
-
 
             modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
                 {
@@ -132,31 +134,6 @@ namespace Web_XuongMay.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Web_XuongMay.Data.TaskOrder", b =>
-                {
-                    b.Property<Guid>("TaskId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ChuyenId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("OrderProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("TaskName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("TaskId");
-
-                    b.HasIndex("ChuyenId");
-
-                    b.HasIndex("OrderProductId");
-
-                    b.ToTable("TaskOrders");
-                });
-
             modelBuilder.Entity("Web_XuongMay.Data.User", b =>
                 {
                     b.Property<int>("Id")
@@ -232,25 +209,6 @@ namespace Web_XuongMay.Migrations
                         .IsRequired();
 
                     b.Navigation("Loai");
-                });
-
-            modelBuilder.Entity("Web_XuongMay.Data.TaskOrder", b =>
-                {
-                    b.HasOne("Web_XuongMay.Data.Chuyen", "Chuyen")
-                        .WithMany()
-                        .HasForeignKey("ChuyenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OrderProduct", "OrderProduct")
-                        .WithMany()
-                        .HasForeignKey("OrderProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chuyen");
-
-                    b.Navigation("OrderProduct");
                 });
 #pragma warning restore 612, 618
         }
