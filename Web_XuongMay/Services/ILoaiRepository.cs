@@ -1,5 +1,6 @@
-﻿using Web_XuongMay.Data;
+using Web_XuongMay.Data;
 using Web_XuongMay.Models;
+using System.Collections.Generic;
 
 namespace Web_XuongMay.Services
 {
@@ -9,10 +10,8 @@ namespace Web_XuongMay.Services
         LoaiVM GetById(Guid id);
         LoaiVM Add(LoaiModel loai);
         void Update(LoaiVM loai);
-
         void Delete(Guid id);
+        
         void Add(Loai loai);
-
-
     }
 }

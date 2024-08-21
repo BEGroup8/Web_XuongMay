@@ -46,6 +46,27 @@ namespace Web_XuongMay.Migrations
                     b.ToTable("OrderProducts");
                 });
 
+            modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
+                {
+                    b.Property<Guid>("LineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NameLine")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("LineId");
+
+                    b.HasIndex("Id");
+
+                    b.ToTable("Line");
+                });
+
             modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
                 {
                     b.Property<Guid>("MaLoai")
@@ -120,11 +141,13 @@ namespace Web_XuongMay.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -137,6 +160,9 @@ namespace Web_XuongMay.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
 
                     b.ToTable("User");
                 });
@@ -160,20 +186,26 @@ namespace Web_XuongMay.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
+                {
+                    b.HasOne("Web_XuongMay.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Web_XuongMay.Data.Products", b =>
                 {
                     b.HasOne("Web_XuongMay.Data.Loai", "Loai")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("MaLoai")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Loai");
-                });
-
-            modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
