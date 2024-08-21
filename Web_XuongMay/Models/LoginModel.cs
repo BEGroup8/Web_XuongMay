@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Web_XuongMay.Models
 {
@@ -7,6 +7,7 @@ namespace Web_XuongMay.Models
         [Required]
         [MaxLength(50)]
         public string UserName { get; set; }
+
         [Required]
         [MaxLength(200)]
         public string Password { get; set; }
