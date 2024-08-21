@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Web_XuongMay.Data;
 
@@ -11,9 +12,11 @@ using Web_XuongMay.Data;
 namespace Web_XuongMay.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240820044147_DbInit")]
+    partial class DbInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,26 +49,19 @@ namespace Web_XuongMay.Migrations
                     b.ToTable("OrderProducts");
                 });
 
-
-            modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
+            modelBuilder.Entity("Web_XuongMay.Data.Chuyen", b =>
                 {
-                    b.Property<Guid>("LineId")
+                    b.Property<Guid>("ChuyenId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NameLine")
+                    b.Property<string>("ChuyenName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("LineId");
+                    b.HasKey("ChuyenId");
 
-                    b.HasIndex("Id");
-
-                    b.ToTable("Line");
+                    b.ToTable("Chuyens");
                 });
 
             modelBuilder.Entity("Web_XuongMay.Data.Loai", b =>
@@ -167,13 +163,11 @@ namespace Web_XuongMay.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -186,9 +180,6 @@ namespace Web_XuongMay.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserName")
-                        .IsUnique();
 
                     b.ToTable("User");
                 });
@@ -210,17 +201,6 @@ namespace Web_XuongMay.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Web_XuongMay.Data.Line", b =>
-                {
-                    b.HasOne("Web_XuongMay.Data.User", "User")
-                        .WithMany()
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Web_XuongMay.Data.Products", b =>
