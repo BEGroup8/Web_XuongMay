@@ -2,10 +2,11 @@
 
 namespace Web_XuongMay.Models
 {
-    public class LoaiModel
+    public class LoaiVM
     {
-        [Required]
-        [MaxLength(50)]
+        
+        public Guid MaLoai { get; set; }
+       
         public string TenLoai { get; set; }
     }
 }

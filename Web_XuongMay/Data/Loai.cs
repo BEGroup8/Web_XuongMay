@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Web_XuongMay.Data
@@ -7,10 +9,11 @@ namespace Web_XuongMay.Data
     public class Loai
     {
         [Key]
-        public int MaLoai { get;set;}
+        public Guid MaLoai { get; set; }  // Sử dụng Guid làm khóa chính
+
         [Required]
         [MaxLength(50)]
-        public string TenLoai { get;set;}
-        public virtual ICollection<Catagory> Catagories { get; set;}
+        public string TenLoai { get; set; }
+
     }
 }
