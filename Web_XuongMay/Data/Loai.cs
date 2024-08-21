@@ -10,7 +10,6 @@ namespace Web_XuongMay.Data
         public int MaLoai { get;set;}
         [Required]
         [MaxLength(50)]
-
         public string TenLoai { get;set;}
         public virtual ICollection<Catagory> Catagories { get; set;}
     }
