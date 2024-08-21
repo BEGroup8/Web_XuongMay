@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http;
@@ -20,14 +20,16 @@ namespace Web_XuongMay.Controllers
         private readonly MyDbContext _context;
         private readonly AppSetting _appSettings;
 
+        // Constructor with IOptionsMonitor for AppSettings
         public UserController(MyDbContext context, IOptionsMonitor<AppSetting> optionsMonitor)
         {
             _context = context;
             _appSettings = optionsMonitor.CurrentValue;
         }
 
+        // Method to validate login
         [HttpPost("Login")]
-        public IActionResult Vadidate(LoginModel model)
+        public IActionResult Validate(LoginModel model)
         {
             var user = _context.Users.SingleOrDefault(p => p.UserName == model.UserName && model.Password == p.Password);
             if (user == null)
@@ -47,6 +49,7 @@ namespace Web_XuongMay.Controllers
             });
         }
 
+        // Method to get all users
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -54,7 +57,7 @@ namespace Web_XuongMay.Controllers
             return Ok(users);
         }
 
-        // GET: api/User/{id}
+        // Method to get user by ID
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -66,7 +69,7 @@ namespace Web_XuongMay.Controllers
             return Ok(user);
         }
 
-        // POST: api/User
+        // Method to create a new user
         [HttpPost]
         public IActionResult CreateNew([FromBody] UserModel userModel)
         {
@@ -102,7 +105,7 @@ namespace Web_XuongMay.Controllers
             }
         }
 
-        // PUT: api/User/{id}
+        // Method to update user by ID
         [HttpPut("{id}")]
         public IActionResult UpdateUserByID(int id, [FromBody] UserModel userModel)
         {
@@ -139,7 +142,7 @@ namespace Web_XuongMay.Controllers
             }
         }
 
-        // DELETE: api/User/{id}
+        // Method to delete user by ID
         [HttpDelete("{id}")]
         public IActionResult DeleteUser(int id)
         {
@@ -170,8 +173,9 @@ namespace Web_XuongMay.Controllers
                 return Convert.ToBase64String(hashedBytes);
             }
         }
-    
-    private string GenerateToken(User user)
+
+        // Method to generate JWT token
+        private string GenerateToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var secretKeyBytes = Encoding.UTF8.GetBytes(_appSettings.SecretKey);
